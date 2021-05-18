@@ -15,6 +15,12 @@ struct DetailView: View {
 
     let book: Book
     
+    var formattedDate: String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateStyle = .medium
+        return dateFormatter.string(from: book.date ?? Date())
+    }
+    
     var body: some View {
         GeometryReader { geometry in
             VStack {
@@ -39,6 +45,9 @@ struct DetailView: View {
                 Text(self.book.review ?? "No review")
                     .padding()
 
+                Text(formattedDate)
+                    .padding(.bottom)
+                
                 RatingView(rating: .constant(Int(self.book.rating)))
                     .font(.largeTitle)
 
@@ -58,6 +67,7 @@ struct DetailView: View {
     
     func deleteBook() {
         moc.delete(book)
+        try? moc.save()
         presentationMode.wrappedValue.dismiss()
     }
 }
@@ -72,6 +82,7 @@ struct DetailView_Previews: PreviewProvider {
         book.genre = "Fantasy"
         book.rating = 4
         book.review = "This was a great book; I really enjoyed it."
+        book.date = Date()
 
         return NavigationView {
             DetailView(book: book)
